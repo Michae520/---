@@ -1,0 +1,54 @@
+# 导入所需的模块
+import numpy as np
+import matplotlib.pyplot as plt
+# 定义一个函数，计算压强
+def pressure(force, area):
+    return force / area
+# 定义一个函数，绘制压强分布图
+def plot_pressure(objects, surfaces) -> object:
+    # 创建一个画布和子图
+    fig, ax = plt.subplots()
+    # 设置标题和坐标轴标签
+    ax.set_title("压强分布图")
+    ax.set_xlabel("物体")
+    ax.set_ylabel("压强（帕）")
+    # 设置坐标轴刻度
+    ax.set_xticks(np.arange(len(objects)))
+    ax.set_xticklabels(objects)
+    # 设置颜色列表
+    colors = ["red", "green", "blue", "yellow", "purple"]
+    # 遍历不同的地面，绘制不同颜色的柱状图
+    for i, surface in enumerate(surfaces):
+        # 计算不同物体对该地面的压强
+        pressures = [pressure(surface["force"], obj["area"]) for obj in objects]
+        # 绘制柱状图，并添加图例
+        ax.bar(np.arange(len(objects)) + i * 0.1, pressures, width=0.1, color=colors[i], label=surface["name"])
+        # 在柱状图上方添加压强数值
+        for j, p in enumerate(pressures):
+            ax.text(j + i * 0.1, p + 0.1, f"{p:.2f}", ha="center", va="bottom")
+    # 显示图例和网格线
+    ax.legend()
+    ax.grid()
+    # 保存并显示图片
+    plt.savefig("pressure.png")
+    plt.show()
+
+# 定义一个列表，存储不同的物体的名称、重量和受力面积
+objects = [
+    {"name": "高跟鞋", "weight": 0.5, "area": 0.001},
+    {"name": "滑雪板", "weight": 2.0, "area": 0.5},
+    {"name": "铁块", "weight": 10.0, "area": 0.01},
+    {"name": "气球", "weight": 0.01, "area": 0.1},
+    {"name": "沙子", "weight": 5.0, "area": 0.05}
+]
+
+# 定义一个列表，存储不同的地面的名称和受到的压力（假设重力加速度为10 m/s^2）
+surfaces = [
+    {"name": "水平地面", "force": lambda weight: weight * 10},
+    {"name": "倾斜地面", "force": lambda weight: weight * 10 * np.cos(np.pi / 6)},
+    {"name": "弹簧地面", "force": lambda weight: weight * 10 - 50},
+    {"name": "粘性地面", "force": lambda weight: weight * 10 + weight * 2},
+    {"name": "弹性地面", "force": lambda weight: weight * 10 + np.sin(weight * np.pi)}
+]
+# 调用绘制压强分布图的函数
+plot_pressure(objects, surfaces)
